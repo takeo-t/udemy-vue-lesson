@@ -1,32 +1,13 @@
 <script setup>
-import { ref, reactive } from 'vue'
-const title = ref('Vue.js Course')
-let price = ref(9.99)
-
-function increment() {
-  price.value += 1
-  instructor.age += 1
-  instructor.email = ref('info@example.com')
-}
-const info = ref({
-  students: 1000,
-  rating: 4,
-})
-
-const instructor = reactive({
-  name: 'John Doe',
-  age: 30,
-})
-
-console.log(instructor.age)
-
-console.log(info.value.students)
+import { ref } from 'vue'
+//ディレクティブで変数のデータを表示するときは、トップレベルで変数を宣言する必要がある
+// const vueURL = ref('https://jp.vuejs.org/')
+// const vueId = ref('vue-link')
+const count = ref(0)
 </script>
 <template>
-  <h1>Title: {{ title }}</h1>
-  <h2>Price: {{ price - 1 }}</h2>
-  <button @click="increment">button</button>
-  <h2>Students: {{ info.students }}</h2>
-  <h2>instructor: {{ instructor.age }}</h2>
-  <h2>instructor: {{ instructor.email }}</h2>
+  <!-- <a :id="vueId" :href="vueURL">Vue.js</a>
+  <p>このリンクのIDは 「{{ vueId }}」です。</p> -->
+  <p>count is: {{ count }}</p>
+  <button @click="count++">button</button>
 </template>
