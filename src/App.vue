@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-const count = ref(0)
-const eventName = 'keyup'
+const userInput = ref('')
 </script>
 <template>
-  <p>{{ count }}</p>
-  <input type="text" @[eventName].space.delete="count++" />
+  <p>{{ userInput }}</p>
+  <input v-model="userInput" type="text" />
+  <button @click="userInput = 'hi'">button</button>
 </template>
