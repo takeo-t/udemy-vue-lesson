@@ -1,15 +1,16 @@
 <script setup>
-import { ref, computed } from 'vue'
-const score = ref(0)
-const evaluation = computed(() => {
-  return score.value > 3 ? 'Good' : 'Bad'
-  // computed関数の中には状態を変更する処理を書いてはいけない
-  // 非同期の処理も状態変更になるので書いてはいけない
+import { ref, watchEffect } from 'vue'
+const count = ref(0)
+watchEffect(() => {
+  console.log('watchEffect')
+  console.log(count.value)
+  setTimeout(() => {
+    console.log('after 1 second')
+  }, 1000)
+  count.value = 'hello'
 })
-console.log(evaluation.value)
 </script>
 <template>
-  <p>{{ evaluation }}</p>
-  <p>{{ score }}</p>
-  <button @click="score++">+1</button>
+  <p>{{ count }}</p>
+  <button @click="count++">+1</button>
 </template>
