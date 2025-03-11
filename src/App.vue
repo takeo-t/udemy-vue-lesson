@@ -1,26 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-const isRed = ref(true)
-const isBgBlue = ref(true)
-const className = ref('red')
-function toggleClass() {
-  isRed.value = !isRed.value
-  isBgBlue.value = !isBgBlue.value
-}
+const ok = ref(true)
+const maybeOK = ref(true)
 </script>
 <template>
-  <!-- <div :class="{ red: isRed, 'bg-blue': isBgBlue }">Hello</div> -->
-  <div class="border" :class="[className, { 'bg-blue': isBgBlue }]">Hello</div>
-  <button @click="toggleClass">Toggle</button>
+  <button @click="ok = !ok">toggle</button>
+  <p v-if="ok">ok!</p>
+  <p v-else-if="maybeOK">maybe OK!</p>
+  <p v-else>not ok</p>
 </template>
-<style>
-.red {
-  color: red;
-}
-.bg-blue {
-  background-color: blue;
-}
-.border {
-  border: 1px solid red;
-}
-</style>
