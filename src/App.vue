@@ -1,10 +1,14 @@
 <script setup>
 import { ref } from 'vue'
-const ok = ref(true)
-// 高頻度で変更されるデータにはv-showを使う。なぜならv-ifはDOMを追加・削除するため、高頻度で変更されるとパフォーマンスが悪くなるから。
-// templeteタグではv-showを使うことができない。
+const fruits = ref([
+  { id: 1, name: 'apple' },
+  { id: 2, name: 'banana' },
+  { id: 3, name: 'cherry' },
+  { id: 4, name: 'date' },
+])
+// keyには配列名を指定できるが、ユニークな値を指定する必要がある
 </script>
 <template>
-  <button @click="ok = !ok">toggle</button>
-  <p v-show="ok">OK</p>
+  <button @click="fruits.shift()">Remove first</button>
+  <li v-for="fruit in fruits" :key="fruit.id"><input type="text" />{{ fruit.name }}</li>
 </template>
