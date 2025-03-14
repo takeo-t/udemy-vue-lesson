@@ -6,9 +6,11 @@ const fruits = ref([
   { id: 3, name: 'cherry' },
   { id: 4, name: 'date' },
 ])
-// keyには配列名を指定できるが、ユニークな値を指定する必要がある
+// indexをkeyに指定することは推奨されない。なぜなら、リストの順番が変わると、Vueは全ての要素を再描画するから。
 </script>
 <template>
   <button @click="fruits.shift()">Remove first</button>
-  <li v-for="fruit in fruits" :key="fruit.id"><input type="text" />{{ fruit.name }}</li>
+  <li v-for="(fruit, index) in fruits" :key="fruit.id">
+    <input type="text" />{{ fruit.name }}({{ index }})
+  </li>
 </template>
