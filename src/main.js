@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from '@/App.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
+import '@/assets/main.css'
 
 const app = createApp(App)
 //コンポーネントのグローバル登録

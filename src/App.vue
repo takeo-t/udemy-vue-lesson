@@ -8,11 +8,6 @@ import BaseButton from '@/components/BaseButton.vue'
   <CountUp id="base-button" class="border" />
   <BaseButton id="base-button" class="border" @click="console.log('App.vue')" />
 </template>
-<style>
-body {
-  background-color: beige;
-}
-</style>
 <style scoped>
 .red {
   color: red;
