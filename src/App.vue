@@ -1,12 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 const ok = ref(true)
-//  templateタグでv-ifディレクティブを使用すると、レンダリング時にtemplateタグ自体が削除される
+// 高頻度で変更されるデータにはv-showを使う。なぜならv-ifはDOMを追加・削除するため、高頻度で変更されるとパフォーマンスが悪くなるから。
+// templeteタグではv-showを使うことができない。
 </script>
 <template>
   <button @click="ok = !ok">toggle</button>
-  <template v-if="ok">
-    <p>OK!</p>
-    <p>Hello</p>
-  </template>
+  <p v-show="ok">OK</p>
 </template>
