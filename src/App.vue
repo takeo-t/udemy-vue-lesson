@@ -1,26 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-const isRed = ref(true)
-const isBgBlue = ref(true)
-const className = ref('red')
-function toggleClass() {
-  isRed.value = !isRed.value
-  isBgBlue.value = !isBgBlue.value
-}
+const user = ref({ name: 'John Doe', age: 25, gender: 'man' })
 </script>
 <template>
-  <!-- <div :class="{ red: isRed, 'bg-blue': isBgBlue }">Hello</div> -->
-  <div class="border" :class="[className, { 'bg-blue': isBgBlue }]">Hello</div>
-  <button @click="toggleClass">Toggle</button>
+  <p v-for="(value, key, index) in user" :key="value">{{ key }}: {{ value }}({{ index }})</p>
 </template>
-<style>
-.red {
-  color: red;
-}
-.bg-blue {
-  background-color: blue;
-}
-.border {
-  border: 1px solid red;
-}
-</style>
