@@ -1,7 +1,15 @@
 <script setup>
-import { ref } from 'vue'
-const user = ref({ name: 'John Doe', age: 25, gender: 'man' })
+import CountUp from '@/components/CountUp.vue'
+import BaseButton from '@/components/BaseButton.vue'
 </script>
 <template>
-  <p v-for="(value, key, index) in user" :key="value">{{ key }}: {{ value }}({{ index }})</p>
+  <h1 class="red">App</h1>
+  <BaseIcon />
+  <CountUp id="base-button" class="border" />
+  <BaseButton id="base-button" class="border" @click="console.log('App.vue')" />
 </template>
+<style scoped>
+.red {
+  color: red;
+}
+</style>
