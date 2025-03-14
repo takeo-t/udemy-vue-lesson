@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-const user = ref({ name: 'John Doe', age: 25, gender: 'man' })
+import CountUp from './ CountUp.vue'
 </script>
 <template>
-  <p v-for="(value, key, index) in user" :key="value">{{ key }}: {{ value }}({{ index }})</p>
+  <CountUp />
+  <CountUp />
+  <CountUp />
 </template>
