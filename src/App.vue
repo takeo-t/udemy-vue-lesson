@@ -6,11 +6,11 @@ const fruits = ref([
   { id: 3, name: 'cherry' },
   { id: 4, name: 'date' },
 ])
-// indexをkeyに指定することは推奨されない。なぜなら、リストの順番が変わると、Vueは全ての要素を再描画するから。
+// 分割代入でidとnameを取り出すことができる。v-forの中で使うときは{}で囲む
 </script>
 <template>
   <button @click="fruits.shift()">Remove first</button>
-  <li v-for="(fruit, index) in fruits" :key="fruit.id">
-    <input type="text" />{{ fruit.name }}({{ index }})
+  <li v-for="({ id, name }, index) in fruits" :key="id">
+    <input type="text" />{{ name }}({{ index }})
   </li>
 </template>
