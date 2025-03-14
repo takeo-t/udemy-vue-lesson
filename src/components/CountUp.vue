@@ -4,7 +4,13 @@ import { ref } from 'vue'
 const count = ref(0)
 </script>
 <template>
-  <h2>CountUp</h2>
-  <p>Count: {{ count }}</p>
+  <!-- <p>{{ $attrs }}</p> -->
+  <h2 v-bind="$attrs">CountUp</h2>
+  <p class="red">Count: {{ count }}</p>
   <button @click="count++">+1</button>
 </template>
+<style scoped>
+.red {
+  color: red;
+}
+</style>
