@@ -1,15 +1,10 @@
 <script setup>
-import CountUp from '@/components/CountUp.vue'
-import BaseButton from '@/components/BaseButton.vue'
+// 親コンポーネント側でPropsとして属性でデータを渡す
+import { ref } from 'vue'
+import ShowCount from './components/ShowCount.vue'
+const count = ref(0)
 </script>
 <template>
-  <h1 class="red">App</h1>
-  <BaseIcon />
-  <CountUp id="base-button" class="border" />
-  <BaseButton id="base-button" class="border" @click="console.log('App.vue')" />
+  <ShowCount :foo="count" bar="hello" />
+  <button @click="count++">+1</button>
 </template>
-<style scoped>
-.red {
-  color: red;
-}
-</style>
