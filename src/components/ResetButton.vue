@@ -1,3 +1,3 @@
 <template>
-  <button @click="$emit('reset')">Reset</button>
+  <button @click="$emit('reset', 100)">Reset</button>
 </template>
