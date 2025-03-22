@@ -1,15 +1,15 @@
 <script setup>
-import CountUp from '@/components/CountUp.vue'
-import BaseButton from '@/components/BaseButton.vue'
+// 子コンポーネントから親コンポーネントにデータを渡すときはエミットを使用する。
+import { ref } from 'vue'
+import ResetButton from './components/ResetButton.vue'
+
+const count = ref(0)
+function onReset(value) {
+  count.value = value
+}
 </script>
 <template>
-  <h1 class="red">App</h1>
-  <BaseIcon />
-  <CountUp id="base-button" class="border" />
-  <BaseButton id="base-button" class="border" @click="console.log('App.vue')" />
+  <p>count: {{ count }}</p>
+  <button @click="count++">+1</button>
+  <ResetButton @reset="onReset" />
 </template>
-<style scoped>
-.red {
-  color: red;
-}
-</style>
