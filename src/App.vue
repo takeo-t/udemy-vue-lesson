@@ -1,15 +1,11 @@
 <script setup>
-// 子コンポーネントから親コンポーネントにデータを渡すときはエミットを使用する。
 import { ref } from 'vue'
-import ResetButton from './components/ResetButton.vue'
-
-const count = ref(0)
-function onReset(value) {
-  count.value = value
-}
+import CountUp from './components/CountUp.vue'
+const isShow = ref(true)
 </script>
 <template>
-  <p>count: {{ count }}</p>
-  <button @click="count++">+1</button>
-  <ResetButton @reset="onReset" />
+  <div>
+    <button @click="isShow = !isShow">switch</button>
+    <CountUp v-if="isShow" />
+  </div>
 </template>
