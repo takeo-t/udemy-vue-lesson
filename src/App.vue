@@ -1,15 +1,12 @@
 <script setup>
-// 子コンポーネントから親コンポーネントにデータを渡すときはエミットを使用する。
-import { ref } from 'vue'
-import ResetButton from './components/ResetButton.vue'
+import { onMounted, useTemplateRef } from 'vue'
 
-const count = ref(0)
-function onReset(value) {
-  count.value = value
-}
+const userInput = useTemplateRef('user-input')
+console.log(userInput.value) // null
+onMounted(() => {
+  console.log(userInput.value.focus())
+})
 </script>
 <template>
-  <p>count: {{ count }}</p>
-  <button @click="count++">+1</button>
-  <ResetButton @reset="onReset" />
+  <input ref="user-input" type="text" />
 </template>
