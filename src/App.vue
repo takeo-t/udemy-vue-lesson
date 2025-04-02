@@ -1,12 +1,10 @@
 <script setup>
-import { onMounted, useTemplateRef } from 'vue'
-
-const userInput = useTemplateRef('user-input')
-console.log(userInput.value) // null
-onMounted(() => {
-  console.log(userInput.value.focus())
-})
+import BaseCard from './components/BaseCard.vue'
 </script>
 <template>
-  <input ref="user-input" type="text" />
+  <h1>Slots</h1>
+  <BaseCard
+    ><h2>Hello</h2>
+    <p>How are you?</p>
+  </BaseCard>
 </template>
