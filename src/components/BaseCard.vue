@@ -1,6 +1,8 @@
 <template>
   <div>
-    <slot />
+    <slot>
+      <p>No Content</p>
+    </slot>
   </div>
 </template>
 <style scoped>
