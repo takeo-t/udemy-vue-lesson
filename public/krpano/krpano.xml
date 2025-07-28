@@ -1,0 +1,11 @@
+<krpano version="1.23">
+
+  <!-- 表示する画像 -->
+  <image>
+    <sphere url="03.jpg" />
+  </image>
+
+  <!-- 視点設定 -->
+  <view hlookat="0" vlookat="0" fov="90" fovtype="MFOV" fovmin="30" fovmax="150" />
+
+</krpano>

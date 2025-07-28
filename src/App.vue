@@ -1,5 +1,6 @@
 <script setup>
 import BaseCard from './components/BaseCard.vue'
+import KrpanoViewer from './components/KrpanoViewer.vue'
 </script>
 <template>
   <h1>Slots</h1>
@@ -14,4 +15,5 @@ import BaseCard from './components/BaseCard.vue'
       <p>Instructor takeo</p>
     </template>
   </BaseCard>
+  <KrpanoViewer />
 </template>
