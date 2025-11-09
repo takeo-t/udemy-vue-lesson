@@ -1,20 +1,26 @@
 <template>
-  <div ref="tabsWrap">
-    <a-radio-group v-model:value="mode" :style="{ marginBottom: '8px' }">
-      <a-radio-button value="top">Horizontal</a-radio-button>
-      <a-radio-button value="left">Vertical</a-radio-button>
-    </a-radio-group>
+  <div ref="tabsWrap" :class="{ sorting: isSorting }">
+    <div ref="tabsWrap">
+      <a-radio-group v-model:value="mode" :style="{ marginBottom: '8px' }">
+        <a-radio-button value="top">Horizontal</a-radio-button>
+        <a-radio-button value="left">Vertical</a-radio-button>
+      </a-radio-group>
 
-    <a-tabs
-      v-model:activeKey="activeKey"
-      :tab-position="mode"
-      :style="{ height: '200px' }"
-      @tabScroll="callback"
-    >
-      <a-tab-pane v-for="pane in panes" :key="pane.key" :tab="pane.title">
-        {{ pane.content }}
-      </a-tab-pane>
-    </a-tabs>
+      <a-tabs
+        v-model:activeKey="activeKey"
+        :tab-position="mode"
+        :style="{ height: '200px' }"
+        @tabScroll="callback"
+      >
+        <a-tab-pane v-for="pane in panes" :key="pane.key">
+          <template #tab>
+            <span class="drag-handle" aria-label="drag to reorder">⋮⋮</span>
+            <span class="tab-title">{{ pane.title }}</span>
+          </template>
+          {{ pane.content }}
+        </a-tab-pane>
+      </a-tabs>
+    </div>
   </div>
 </template>
 
@@ -25,6 +31,7 @@ import Sortable from 'sortablejs'
 
 // タブ位置（水平/垂直）
 const mode = ref<TabsProps['tabPosition']>('top')
+const isSorting = ref(false)
 
 // アクティブキーは文字列が無難（AntD側の期待に合わせる）
 const activeKey = ref('1')
@@ -70,15 +77,6 @@ function stopAutoScroll() {
   scrollDirX = 0
 }
 
-function tickAutoScroll(wrap: HTMLElement, speed = 18) {
-  if (scrollDirX === 0) {
-    rafId = null
-    return
-  }
-  wrap.scrollLeft += scrollDirX * speed
-  rafId = requestAnimationFrame(() => tickAutoScroll(wrap, speed))
-}
-
 // 追加：座標取り出しユーティリティ
 function getClientXY(e: Event): { x: number; y: number } {
   if ('clientX' in e && 'clientY' in e) {
@@ -88,6 +86,48 @@ function getClientXY(e: Event): { x: number; y: number } {
   const t = e as TouchEvent
   const touch = t.touches?.[0] ?? t.changedTouches?.[0]
   return { x: touch?.clientX ?? 0, y: touch?.clientY ?? 0 }
+}
+
+function tickAutoScroll(wrap: HTMLElement, speed = 18) {
+  if (scrollDirX === 0) {
+    rafId = null
+    return
+  }
+  const max = wrap.scrollWidth - wrap.clientWidth
+  const next = wrap.scrollLeft + scrollDirX * speed
+  wrap.scrollLeft = Math.max(0, Math.min(max, next))
+  rafId = requestAnimationFrame(() => tickAutoScroll(wrap, speed))
+}
+
+// 追加：operationsボタン連打用
+let opsTimer: number | null = null
+function stopOpsAutoScroll() {
+  if (opsTimer != null) {
+    window.clearInterval(opsTimer)
+    opsTimer = null
+  }
+}
+function startOpsAutoScroll(wrap: HTMLElement, dir: 'left' | 'right') {
+  stopOpsAutoScroll()
+  const ops = wrap.parentElement?.querySelector('.ant-tabs-nav-operations') as HTMLElement | null
+  if (!ops) return
+
+  // Prev/Next ボタンをゆるく特定（クラス名はバージョンで差があるため部分一致で）
+  const prevBtn = ops.querySelector(
+    '[class*="tab-prev"],[class*="nav-operations-prev"],[aria-label*="Prev"]',
+  ) as HTMLButtonElement | null
+  const nextBtn = ops.querySelector(
+    '[class*="tab-next"],[class*="nav-operations-next"],[aria-label*="Next"]',
+  ) as HTMLButtonElement | null
+
+  const target = dir === 'left' ? prevBtn : nextBtn
+  if (!target) return
+
+  // 押しっぱなし連打（120ms間隔は体感ちょうど良い）
+  opsTimer = window.setInterval(() => {
+    if (target.hasAttribute('disabled')) return
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+  }, 120)
 }
 
 function initSortable() {
@@ -106,54 +146,45 @@ function initSortable() {
   wrap.style.overflowY = 'hidden'
   ;(wrap.parentElement as HTMLElement)?.style.setProperty('max-width', '100%')
 
+  // Sortable.create 内：scroll 系は削除・無効化してOK（transform は AntD に任せる）
   sortable = Sortable.create(tabBar, {
     animation: 150,
     draggable: '.ant-tabs-tab',
-    handle: '.ant-tabs-tab',
+    handle: '.drag-handle' /* ← ハンドル分離しておくと誤爆が減る。なければ .ant-tabs-tab でも可 */,
     ghostClass: 'sortable-ghost',
+    direction: 'horizontal',
     forceFallback: true,
-    bubbleScroll: true,
-    scroll: true,
-    scrollSensitivity: 60,
-    scrollSpeed: 16,
-    scrollFn: (offsetX, offsetY) => {
-      if (!wrap) return
-      if (offsetX) wrap.scrollLeft += offsetX
-      if (offsetY) wrap.scrollTop += offsetY
-    },
 
     onStart: () => {
-      stopAutoScroll() // 念のためリセット
+      stopOpsAutoScroll()
     },
 
     onMove: (evt, originalEvent) => {
+      const wrap = tabsWrap.value?.querySelector('.ant-tabs-nav-wrap') as HTMLElement | null
       if (!wrap) return
-
-      const THRESH = 80
+      const THRESH = 100
       const rect = wrap.getBoundingClientRect()
-      const { x } = getClientXY(originalEvent)
+      const draggedLeft = evt.draggedRect?.left
+      const draggedRight = evt.draggedRect?.right
 
-      // 左端 / 右端の判定
-      if (x < rect.left + THRESH) {
-        scrollDirX = -1
-      } else if (x > rect.right - THRESH) {
-        scrollDirX = +1
+      // マウス/タッチ座標（保険）
+      const { x } = getClientXY(originalEvent as Event)
+      const nearLeft =
+        (draggedLeft != null && draggedLeft <= rect.left + THRESH) || x <= rect.left + THRESH
+      const nearRight =
+        (draggedRight != null && draggedRight >= rect.right - THRESH) || x >= rect.right - THRESH
+
+      if (nearLeft) {
+        startOpsAutoScroll(wrap, 'left')
+      } else if (nearRight) {
+        startOpsAutoScroll(wrap, 'right')
       } else {
-        scrollDirX = 0
+        stopOpsAutoScroll()
       }
-
-      if (rafId == null && scrollDirX !== 0) {
-        rafId = requestAnimationFrame(() => tickAutoScroll(wrap))
-      }
-      if (scrollDirX === 0 && rafId != null) {
-        stopAutoScroll()
-      }
-
-      // 何も返さなければそのまま続行（return false でキャンセルできる）
     },
 
     onEnd: ({ oldIndex, newIndex }) => {
-      stopAutoScroll()
+      stopOpsAutoScroll()
       if (oldIndex == null || newIndex == null || oldIndex === newIndex) return
       const moved = panes.value.splice(oldIndex, 1)[0]
       panes.value.splice(newIndex, 0, moved)
@@ -163,24 +194,35 @@ function initSortable() {
 </script>
 
 <style scoped>
-.sortable-ghost {
-  opacity: 0.4;
-}
-
-/* ★ 幅固定しているならそのまま */
-:deep(.ant-tabs-tab) {
-  cursor: move;
-  width: 200px !important;
-  flex: 0 0 200px !important;
-}
-
 :deep(.ant-tabs-nav-wrap) {
   overflow-x: auto !important;
   overflow-y: hidden !important;
   max-width: 100% !important;
+  overscroll-behavior-x: contain;
 }
 
-/* 不要なら操作ボタンを隠す（被ると端判定が鈍る） */
+/* タブ本体はスクロールしやすく（ドラッグはハンドルだけ） */
+:deep(.ant-tabs-tab) {
+  touch-action: pan-x; /* ← トラックパッド/タッチでの横スクロールを優先 */
+  cursor: default; /* 本体はドラッグ対象ではない */
+  width: 200px !important;
+  flex: 0 0 200px !important;
+}
+
+/* ハンドルだけ掴めるように */
+:deep(.drag-handle) {
+  display: inline-block;
+  margin-right: 8px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none; /* ハンドル上はスクロールよりドラッグを優先 */
+}
+:deep(.drag-handle:active) {
+  cursor: grabbing;
+}
+
+/* 操作ボタンが端の当たりを邪魔する場合は非表示でOK */
 :deep(.ant-tabs-nav-operations) {
   display: none !important;
 }
